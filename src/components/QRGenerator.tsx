@@ -1,22 +1,71 @@
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
-import { Download, Sparkles } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Download, Sparkles, Wifi, User, Mail, Phone, MessageSquare, Link2, Type } from "lucide-react";
 import { toast } from "sonner";
+import { WiFiForm, formatWiFi } from "./templates/WiFiForm";
+import { VCardForm, formatVCard } from "./templates/VCardForm";
+import { EmailForm, formatEmail } from "./templates/EmailForm";
+import { PhoneForm, formatPhone } from "./templates/PhoneForm";
+import { SMSForm, formatSMS } from "./templates/SMSForm";
+import { URLForm, formatURL } from "./templates/URLForm";
+import { TextForm, formatText } from "./templates/TextForm";
+
+type TemplateType = "text" | "url" | "wifi" | "vcard" | "email" | "phone" | "sms";
 
 const QRGenerator = () => {
-  const [text, setText] = useState("");
+  const [activeTemplate, setActiveTemplate] = useState<TemplateType>("url");
   const [size, setSize] = useState(256);
   const [fgColor, setFgColor] = useState("#000000");
   const [bgColor, setBgColor] = useState("#FFFFFF");
 
+  // Template data states
+  const [textData, setTextData] = useState({ text: "" });
+  const [urlData, setUrlData] = useState({ url: "" });
+  const [wifiData, setWifiData] = useState({ ssid: "", password: "", encryption: "WPA", hidden: false });
+  const [vcardData, setVcardData] = useState({
+    firstName: "",
+    lastName: "",
+    organization: "",
+    phone: "",
+    email: "",
+    website: "",
+    address: "",
+  });
+  const [emailData, setEmailData] = useState({ email: "", subject: "", body: "" });
+  const [phoneData, setPhoneData] = useState({ phone: "" });
+  const [smsData, setSmsData] = useState({ phone: "", message: "" });
+
+  const getQRValue = () => {
+    switch (activeTemplate) {
+      case "text":
+        return formatText(textData);
+      case "url":
+        return formatURL(urlData);
+      case "wifi":
+        return formatWiFi(wifiData);
+      case "vcard":
+        return formatVCard(vcardData);
+      case "email":
+        return formatEmail(emailData);
+      case "phone":
+        return formatPhone(phoneData);
+      case "sms":
+        return formatSMS(smsData);
+      default:
+        return "";
+    }
+  };
+
+  const qrValue = getQRValue();
+
   const handleDownload = () => {
     const svg = document.getElementById("qr-code");
-    if (!svg) return;
+    if (!svg || !qrValue) return;
 
     const svgData = new XMLSerializer().serializeToString(svg);
     const canvas = document.createElement("canvas");
@@ -33,7 +82,7 @@ const QRGenerator = () => {
           const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
-          link.download = "qrcode.png";
+          link.download = `qrcode-${activeTemplate}.png`;
           link.click();
           URL.revokeObjectURL(url);
           toast.success("QR Code downloaded successfully!");
@@ -44,9 +93,19 @@ const QRGenerator = () => {
     img.src = "data:image/svg+xml;base64," + btoa(svgData);
   };
 
+  const templates = [
+    { id: "url", label: "URL", icon: Link2 },
+    { id: "text", label: "Text", icon: Type },
+    { id: "wifi", label: "WiFi", icon: Wifi },
+    { id: "vcard", label: "Contact", icon: User },
+    { id: "email", label: "Email", icon: Mail },
+    { id: "phone", label: "Phone", icon: Phone },
+    { id: "sms", label: "SMS", icon: MessageSquare },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center p-4">
-      <div className="w-full max-w-5xl">
+      <div className="w-full max-w-6xl">
         <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="inline-flex items-center gap-2 mb-4">
             <Sparkles className="w-8 h-8 text-primary" />
@@ -55,88 +114,98 @@ const QRGenerator = () => {
             </h1>
           </div>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Create custom QR codes instantly. Enter any text, URL, or data and generate a
-            professional QR code with customizable colors and size.
+            Create custom QR codes for WiFi, contacts, URLs, and more. Choose a template and fill in your details.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150">
+        <div className="grid lg:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-150">
           {/* Controls Panel */}
           <Card className="shadow-lg border-border/50 backdrop-blur-sm bg-card/95">
             <CardContent className="pt-6 space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="text-input" className="text-base font-semibold">
-                  Enter Your Data
-                </Label>
-                <Input
-                  id="text-input"
-                  type="text"
-                  placeholder="Enter URL, text, or any data..."
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  className="text-base h-12 transition-all duration-300 focus:ring-2 focus:ring-primary"
-                />
-                <p className="text-sm text-muted-foreground">
-                  Try a URL like https://example.com or any text
-                </p>
-              </div>
+              {/* Template Selector */}
+              <Tabs value={activeTemplate} onValueChange={(v) => setActiveTemplate(v as TemplateType)}>
+                <TabsList className="grid grid-cols-4 lg:grid-cols-7 gap-2 h-auto p-1 bg-muted/50">
+                  {templates.map((template) => {
+                    const Icon = template.icon;
+                    return (
+                      <TabsTrigger
+                        key={template.id}
+                        value={template.id}
+                        className="flex flex-col items-center gap-1 py-2 px-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span className="text-xs">{template.label}</span>
+                      </TabsTrigger>
+                    );
+                  })}
+                </TabsList>
 
-              <div className="space-y-2">
-                <Label htmlFor="size-slider" className="text-base font-semibold">
-                  Size: {size}px
-                </Label>
-                <Slider
-                  id="size-slider"
-                  min={128}
-                  max={512}
-                  step={32}
-                  value={[size]}
-                  onValueChange={(value) => setSize(value[0])}
-                  className="py-4"
-                />
-              </div>
+                <div className="mt-6">
+                  <TabsContent value="text" className="mt-0">
+                    <TextForm data={textData} onChange={setTextData} />
+                  </TabsContent>
 
-              <div className="grid grid-cols-2 gap-4">
+                  <TabsContent value="url" className="mt-0">
+                    <URLForm data={urlData} onChange={setUrlData} />
+                  </TabsContent>
+
+                  <TabsContent value="wifi" className="mt-0">
+                    <WiFiForm data={wifiData} onChange={setWifiData} />
+                  </TabsContent>
+
+                  <TabsContent value="vcard" className="mt-0">
+                    <VCardForm data={vcardData} onChange={setVcardData} />
+                  </TabsContent>
+
+                  <TabsContent value="email" className="mt-0">
+                    <EmailForm data={emailData} onChange={setEmailData} />
+                  </TabsContent>
+
+                  <TabsContent value="phone" className="mt-0">
+                    <PhoneForm data={phoneData} onChange={setPhoneData} />
+                  </TabsContent>
+
+                  <TabsContent value="sms" className="mt-0">
+                    <SMSForm data={smsData} onChange={setSmsData} />
+                  </TabsContent>
+                </div>
+              </Tabs>
+
+              {/* Customization Options */}
+              <div className="pt-4 border-t border-border/50 space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fg-color" className="text-base font-semibold">
-                    Foreground
+                  <Label htmlFor="size-slider" className="text-base font-semibold">
+                    Size: {size}px
                   </Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="fg-color"
-                      type="color"
-                      value={fgColor}
-                      onChange={(e) => setFgColor(e.target.value)}
-                      className="w-16 h-12 cursor-pointer"
-                    />
-                    <Input
-                      type="text"
-                      value={fgColor}
-                      onChange={(e) => setFgColor(e.target.value)}
-                      className="flex-1 h-12"
-                      placeholder="#000000"
-                    />
-                  </div>
+                  <Slider
+                    id="size-slider"
+                    min={128}
+                    max={512}
+                    step={32}
+                    value={[size]}
+                    onValueChange={(value) => setSize(value[0])}
+                    className="py-4"
+                  />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="bg-color" className="text-base font-semibold">
-                    Background
-                  </Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="bg-color"
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">Foreground</Label>
+                    <input
+                      type="color"
+                      value={fgColor}
+                      onChange={(e) => setFgColor(e.target.value)}
+                      className="w-full h-10 rounded-md border border-input cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">Background</Label>
+                    <input
                       type="color"
                       value={bgColor}
                       onChange={(e) => setBgColor(e.target.value)}
-                      className="w-16 h-12 cursor-pointer"
-                    />
-                    <Input
-                      type="text"
-                      value={bgColor}
-                      onChange={(e) => setBgColor(e.target.value)}
-                      className="flex-1 h-12"
-                      placeholder="#FFFFFF"
+                      className="w-full h-10 rounded-md border border-input cursor-pointer"
                     />
                   </div>
                 </div>
@@ -144,7 +213,7 @@ const QRGenerator = () => {
 
               <Button
                 onClick={handleDownload}
-                disabled={!text}
+                disabled={!qrValue}
                 className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-all duration-300 disabled:opacity-50"
               >
                 <Download className="w-5 h-5 mr-2" />
@@ -155,12 +224,12 @@ const QRGenerator = () => {
 
           {/* QR Code Display */}
           <Card className="shadow-lg border-border/50 backdrop-blur-sm bg-card/95">
-            <CardContent className="pt-6 flex items-center justify-center min-h-[400px]">
-              {text ? (
+            <CardContent className="pt-6 flex items-center justify-center min-h-[500px]">
+              {qrValue ? (
                 <div className="p-8 bg-white rounded-xl shadow-md transition-all duration-300 hover:shadow-xl">
                   <QRCodeSVG
                     id="qr-code"
-                    value={text}
+                    value={qrValue}
                     size={size}
                     level="H"
                     fgColor={fgColor}
@@ -173,9 +242,12 @@ const QRGenerator = () => {
                   <div className="w-32 h-32 mx-auto rounded-xl bg-muted/50 flex items-center justify-center">
                     <Sparkles className="w-16 h-16 text-muted-foreground/30" />
                   </div>
-                  <p className="text-lg text-muted-foreground">
-                    Enter some data to generate your QR code
-                  </p>
+                  <div>
+                    <p className="text-lg font-semibold mb-2">Choose a template above</p>
+                    <p className="text-sm text-muted-foreground">
+                      Fill in the form to generate your QR code
+                    </p>
+                  </div>
                 </div>
               )}
             </CardContent>
@@ -184,8 +256,7 @@ const QRGenerator = () => {
 
         <footer className="mt-12 text-center text-sm text-muted-foreground animate-in fade-in duration-700 delay-300">
           <p>
-            Created with precision • Scan with any QR code reader • Works with URLs, text,
-            and more
+            Professional QR codes • Multiple formats • Fully customizable • Instant download
           </p>
         </footer>
       </div>
