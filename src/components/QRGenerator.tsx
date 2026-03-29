@@ -70,7 +70,7 @@ const QRGenerator = () => {
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("qr_codes").insert({
+      const { error } = await supabase.from("qr_codes").insert([{
         user_id: user!.id,
         template_type: activeTemplate,
         template_data: getTemplateData() as Record<string, unknown>,
@@ -78,7 +78,7 @@ const QRGenerator = () => {
         fg_color: fgColor,
         bg_color: bgColor,
         size,
-      });
+      }]);
       if (error) throw error;
     },
     onSuccess: () => {
