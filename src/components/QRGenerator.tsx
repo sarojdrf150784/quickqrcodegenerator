@@ -73,7 +73,7 @@ const QRGenerator = () => {
       const { error } = await supabase.from("qr_codes").insert([{
         user_id: user!.id,
         template_type: activeTemplate,
-        template_data: getTemplateData() as Record<string, unknown>,
+        template_data: getTemplateData() as any,
         qr_value: qrValue,
         fg_color: fgColor,
         bg_color: bgColor,
