@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      qr_codes: {
+        Row: {
+          bg_color: string
+          created_at: string
+          fg_color: string
+          id: string
+          label: string | null
+          qr_value: string
+          size: number
+          template_data: Json
+          template_type: string
+          user_id: string
+        }
+        Insert: {
+          bg_color?: string
+          created_at?: string
+          fg_color?: string
+          id?: string
+          label?: string | null
+          qr_value: string
+          size?: number
+          template_data: Json
+          template_type: string
+          user_id: string
+        }
+        Update: {
+          bg_color?: string
+          created_at?: string
+          fg_color?: string
+          id?: string
+          label?: string | null
+          qr_value?: string
+          size?: number
+          template_data?: Json
+          template_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
