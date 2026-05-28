@@ -20,6 +20,8 @@ import { PhoneForm, formatPhone } from "./templates/PhoneForm";
 import { SMSForm, formatSMS } from "./templates/SMSForm";
 import { URLForm, formatURL } from "./templates/URLForm";
 import { TextForm, formatText } from "./templates/TextForm";
+import QRStylePicker from "./QRStylePicker";
+import QRFrame from "./QRFrame";
 
 type TemplateType = "text" | "url" | "wifi" | "vcard" | "email" | "phone" | "sms";
 
