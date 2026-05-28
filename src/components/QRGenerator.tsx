@@ -30,6 +30,9 @@ const QRGenerator = () => {
   const [size, setSize] = useState(256);
   const [fgColor, setFgColor] = useState("#000000");
   const [bgColor, setBgColor] = useState("#FFFFFF");
+  const [label, setLabel] = useState("");
+  const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [textData, setTextData] = useState({ text: "" });
   const [urlData, setUrlData] = useState({ url: "" });
@@ -40,6 +43,18 @@ const QRGenerator = () => {
   const [emailData, setEmailData] = useState({ email: "", subject: "", body: "" });
   const [phoneData, setPhoneData] = useState({ phone: "" });
   const [smsData, setSmsData] = useState({ phone: "", message: "" });
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 500_000) {
+      toast.error("Logo must be under 500KB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setLogoDataUrl(reader.result as string);
+    reader.readAsDataURL(file);
+  };
 
   const getTemplateData = () => {
     switch (activeTemplate) {
