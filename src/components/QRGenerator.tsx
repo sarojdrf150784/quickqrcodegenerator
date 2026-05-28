@@ -120,6 +120,8 @@ const QRGenerator = () => {
     setFgColor(item.fg_color);
     setBgColor(item.bg_color);
     setSize(item.size);
+    setLabel(item.label || "");
+    setLogoDataUrl(item.logo_data_url || null);
     const d = item.template_data;
     switch (type) {
       case "text": setTextData(d as typeof textData); break;
