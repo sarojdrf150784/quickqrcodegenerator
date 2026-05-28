@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { History, Trash2, RotateCcw, Download, FolderPlus, Folder, FolderOpen, Pencil, MoreVertical, Check, X } from "lucide-react";
 import { toast } from "sonner";
+import QRFrame from "./QRFrame";
 
 interface QRHistoryItem {
   id: string;
