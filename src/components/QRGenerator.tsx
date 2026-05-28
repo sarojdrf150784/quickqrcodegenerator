@@ -120,6 +120,8 @@ const QRGenerator = () => {
     size: number;
     label?: string | null;
     logo_data_url?: string | null;
+    border_style?: string | null;
+    design_preset?: string | null;
   }) => {
     const type = item.template_type as TemplateType;
     setActiveTemplate(type);
@@ -128,6 +130,8 @@ const QRGenerator = () => {
     setSize(item.size);
     setLabel(item.label || "");
     setLogoDataUrl(item.logo_data_url || null);
+    setBorderStyle(item.border_style || "none");
+    setDesignPreset(item.design_preset || null);
     const d = item.template_data;
     switch (type) {
       case "text": setTextData(d as typeof textData); break;
