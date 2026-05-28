@@ -251,6 +251,34 @@ const QRGenerator = () => {
                     <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-full h-10 rounded-md border border-input cursor-pointer" />
                   </div>
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="label-input" className="text-sm font-semibold">Label (optional)</Label>
+                  <Input id="label-input" placeholder="My QR code" value={label} onChange={(e) => setLabel(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold">Center Logo</Label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                    <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="flex-1">
+                      <ImagePlus className="w-4 h-4 mr-2" />
+                      {logoDataUrl ? "Change Logo" : "Upload Logo"}
+                    </Button>
+                    {logoDataUrl && (
+                      <>
+                        <img src={logoDataUrl} alt="Logo preview" className="w-9 h-9 rounded border border-border object-contain bg-white" />
+                        <Button type="button" variant="ghost" size="icon" onClick={() => { setLogoDataUrl(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}>
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="flex gap-2">
