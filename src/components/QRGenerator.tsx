@@ -34,6 +34,8 @@ const QRGenerator = () => {
   const [bgColor, setBgColor] = useState("#FFFFFF");
   const [label, setLabel] = useState("");
   const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
+  const [borderStyle, setBorderStyle] = useState<string>("none");
+  const [designPreset, setDesignPreset] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [textData, setTextData] = useState({ text: "" });
