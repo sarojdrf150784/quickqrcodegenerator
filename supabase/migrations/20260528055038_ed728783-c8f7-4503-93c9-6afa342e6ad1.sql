@@ -1,0 +1,1 @@
+ALTER TABLE public.qr_codes ADD COLUMN border_style TEXT NOT NULL DEFAULT 'none'; ALTER TABLE public.qr_codes ADD COLUMN design_preset TEXT;

@@ -20,6 +20,8 @@ import { PhoneForm, formatPhone } from "./templates/PhoneForm";
 import { SMSForm, formatSMS } from "./templates/SMSForm";
 import { URLForm, formatURL } from "./templates/URLForm";
 import { TextForm, formatText } from "./templates/TextForm";
+import QRStylePicker from "./QRStylePicker";
+import QRFrame from "./QRFrame";
 
 type TemplateType = "text" | "url" | "wifi" | "vcard" | "email" | "phone" | "sms";
 
@@ -32,6 +34,8 @@ const QRGenerator = () => {
   const [bgColor, setBgColor] = useState("#FFFFFF");
   const [label, setLabel] = useState("");
   const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
+  const [borderStyle, setBorderStyle] = useState<string>("none");
+  const [designPreset, setDesignPreset] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [textData, setTextData] = useState({ text: "" });
@@ -96,6 +100,8 @@ const QRGenerator = () => {
         size,
         label: label || null,
         logo_data_url: logoDataUrl,
+        border_style: borderStyle,
+        design_preset: designPreset,
       }]);
       if (error) throw error;
     },
@@ -114,6 +120,8 @@ const QRGenerator = () => {
     size: number;
     label?: string | null;
     logo_data_url?: string | null;
+    border_style?: string | null;
+    design_preset?: string | null;
   }) => {
     const type = item.template_type as TemplateType;
     setActiveTemplate(type);
@@ -122,6 +130,8 @@ const QRGenerator = () => {
     setSize(item.size);
     setLabel(item.label || "");
     setLogoDataUrl(item.logo_data_url || null);
+    setBorderStyle(item.border_style || "none");
+    setDesignPreset(item.design_preset || null);
     const d = item.template_data;
     switch (type) {
       case "text": setTextData(d as typeof textData); break;
@@ -237,6 +247,16 @@ const QRGenerator = () => {
               </Tabs>
 
               <div className="pt-4 border-t border-border/50 space-y-4">
+                <QRStylePicker
+                  designPreset={designPreset}
+                  borderStyle={borderStyle}
+                  onPresetChange={(id, fg, bg) => {
+                    setDesignPreset(id);
+                    setFgColor(fg);
+                    setBgColor(bg);
+                  }}
+                  onBorderChange={setBorderStyle}
+                />
                 <div className="space-y-2">
                   <Label htmlFor="size-slider" className="text-base font-semibold">Size: {size}px</Label>
                   <Slider id="size-slider" min={128} max={512} step={32} value={[size]} onValueChange={(v) => setSize(v[0])} className="py-4" />
@@ -244,11 +264,11 @@ const QRGenerator = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-sm font-semibold">Foreground</Label>
-                    <input type="color" value={fgColor} onChange={(e) => setFgColor(e.target.value)} className="w-full h-10 rounded-md border border-input cursor-pointer" />
+                    <input type="color" value={fgColor} onChange={(e) => { setFgColor(e.target.value); setDesignPreset(null); }} className="w-full h-10 rounded-md border border-input cursor-pointer" />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm font-semibold">Background</Label>
-                    <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-full h-10 rounded-md border border-input cursor-pointer" />
+                    <input type="color" value={bgColor} onChange={(e) => { setBgColor(e.target.value); setDesignPreset(null); }} className="w-full h-10 rounded-md border border-input cursor-pointer" />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -299,17 +319,19 @@ const QRGenerator = () => {
           <Card className="shadow-lg border-border/50 backdrop-blur-sm bg-card/95">
             <CardContent className="pt-6 flex items-center justify-center min-h-[400px]">
               {qrValue ? (
-                <div className="p-8 bg-white rounded-xl shadow-md transition-all duration-300 hover:shadow-xl">
-                  <QRCodeSVG
-                    id="qr-code"
-                    value={qrValue}
-                    size={Math.min(size, 300)}
-                    level="H"
-                    fgColor={fgColor}
-                    bgColor={bgColor}
-                    className="transition-all duration-300"
-                    imageSettings={logoDataUrl ? { src: logoDataUrl, height: Math.min(size, 300) * 0.2, width: Math.min(size, 300) * 0.2, excavate: true } : undefined}
-                  />
+                <div className="transition-all duration-300">
+                  <QRFrame borderStyle={borderStyle} fgColor={fgColor} bgColor={bgColor}>
+                    <QRCodeSVG
+                      id="qr-code"
+                      value={qrValue}
+                      size={Math.min(size, 280)}
+                      level="H"
+                      fgColor={fgColor}
+                      bgColor={bgColor}
+                      className="transition-all duration-300"
+                      imageSettings={logoDataUrl ? { src: logoDataUrl, height: Math.min(size, 280) * 0.2, width: Math.min(size, 280) * 0.2, excavate: true } : undefined}
+                    />
+                  </QRFrame>
                 </div>
               ) : (
                 <div className="text-center space-y-4 px-8">
