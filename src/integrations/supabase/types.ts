@@ -19,8 +19,10 @@ export type Database = {
           bg_color: string
           created_at: string
           fg_color: string
+          folder_id: string | null
           id: string
           label: string | null
+          logo_data_url: string | null
           qr_value: string
           size: number
           template_data: Json
@@ -31,8 +33,10 @@ export type Database = {
           bg_color?: string
           created_at?: string
           fg_color?: string
+          folder_id?: string | null
           id?: string
           label?: string | null
+          logo_data_url?: string | null
           qr_value: string
           size?: number
           template_data: Json
@@ -43,12 +47,43 @@ export type Database = {
           bg_color?: string
           created_at?: string
           fg_color?: string
+          folder_id?: string | null
           id?: string
           label?: string | null
+          logo_data_url?: string | null
           qr_value?: string
           size?: number
           template_data?: Json
           template_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qr_codes_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "qr_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qr_folders: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
           user_id?: string
         }
         Relationships: []
