@@ -37,6 +37,8 @@ interface QRHistoryItem {
   label: string | null;
   logo_data_url: string | null;
   folder_id: string | null;
+  border_style: string | null;
+  design_preset: string | null;
   created_at: string;
 }
 
