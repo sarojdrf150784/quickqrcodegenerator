@@ -123,7 +123,7 @@ const QRHistory = ({ onRegenerate }: QRHistoryProps) => {
   });
 
   const updateItemMutation = useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: Partial<QRHistoryItem> }) => {
+    mutationFn: async ({ id, patch }: { id: string; patch: { label?: string | null; folder_id?: string | null } }) => {
       const { error } = await supabase.from("qr_codes").update(patch).eq("id", id);
       if (error) throw error;
     },
