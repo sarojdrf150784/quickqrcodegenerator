@@ -277,21 +277,23 @@ const QRHistory = ({ onRegenerate }: QRHistoryProps) => {
                     key={item.id}
                     className="flex items-center gap-3 p-3 rounded-lg border border-border/50 bg-muted/30 hover:bg-muted/50 transition-colors"
                   >
-                    <div className="shrink-0 bg-white rounded p-1">
-                      <QRCodeSVG
-                        id={`qr-history-${item.id}`}
-                        value={item.qr_value}
-                        size={item.size}
-                        level="H"
-                        fgColor={item.fg_color}
-                        bgColor={item.bg_color}
-                        style={{ width: 48, height: 48 }}
-                        imageSettings={
-                          item.logo_data_url
-                            ? { src: item.logo_data_url, height: item.size * 0.2, width: item.size * 0.2, excavate: true }
-                            : undefined
-                        }
-                      />
+                    <div className="shrink-0">
+                      <QRFrame borderStyle={item.border_style || "none"} fgColor={item.fg_color} bgColor={item.bg_color}>
+                        <QRCodeSVG
+                          id={`qr-history-${item.id}`}
+                          value={item.qr_value}
+                          size={item.size}
+                          level="H"
+                          fgColor={item.fg_color}
+                          bgColor={item.bg_color}
+                          style={{ width: 44, height: 44 }}
+                          imageSettings={
+                            item.logo_data_url
+                              ? { src: item.logo_data_url, height: item.size * 0.2, width: item.size * 0.2, excavate: true }
+                              : undefined
+                          }
+                        />
+                      </QRFrame>
                     </div>
                     <div className="flex-1 min-w-0">
                       {isEditing ? (
