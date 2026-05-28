@@ -100,6 +100,8 @@ const QRGenerator = () => {
         size,
         label: label || null,
         logo_data_url: logoDataUrl,
+        border_style: borderStyle,
+        design_preset: designPreset,
       }]);
       if (error) throw error;
     },
