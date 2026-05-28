@@ -94,6 +94,8 @@ const QRGenerator = () => {
         fg_color: fgColor,
         bg_color: bgColor,
         size,
+        label: label || null,
+        logo_data_url: logoDataUrl,
       }]);
       if (error) throw error;
     },
@@ -105,6 +107,14 @@ const QRGenerator = () => {
   });
 
   const handleRegenerate = (item: {
+    template_type: string;
+    template_data: Record<string, unknown>;
+    fg_color: string;
+    bg_color: string;
+    size: number;
+    label?: string | null;
+    logo_data_url?: string | null;
+  }) => {
     template_type: string;
     template_data: Record<string, unknown>;
     fg_color: string;
