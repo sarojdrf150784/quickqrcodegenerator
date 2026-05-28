@@ -247,6 +247,16 @@ const QRGenerator = () => {
               </Tabs>
 
               <div className="pt-4 border-t border-border/50 space-y-4">
+                <QRStylePicker
+                  designPreset={designPreset}
+                  borderStyle={borderStyle}
+                  onPresetChange={(id, fg, bg) => {
+                    setDesignPreset(id);
+                    setFgColor(fg);
+                    setBgColor(bg);
+                  }}
+                  onBorderChange={setBorderStyle}
+                />
                 <div className="space-y-2">
                   <Label htmlFor="size-slider" className="text-base font-semibold">Size: {size}px</Label>
                   <Slider id="size-slider" min={128} max={512} step={32} value={[size]} onValueChange={(v) => setSize(v[0])} className="py-4" />
@@ -254,11 +264,11 @@ const QRGenerator = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-sm font-semibold">Foreground</Label>
-                    <input type="color" value={fgColor} onChange={(e) => setFgColor(e.target.value)} className="w-full h-10 rounded-md border border-input cursor-pointer" />
+                    <input type="color" value={fgColor} onChange={(e) => { setFgColor(e.target.value); setDesignPreset(null); }} className="w-full h-10 rounded-md border border-input cursor-pointer" />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-sm font-semibold">Background</Label>
-                    <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-full h-10 rounded-md border border-input cursor-pointer" />
+                    <input type="color" value={bgColor} onChange={(e) => { setBgColor(e.target.value); setDesignPreset(null); }} className="w-full h-10 rounded-md border border-input cursor-pointer" />
                   </div>
                 </div>
                 <div className="space-y-2">
