@@ -17,7 +17,9 @@ export type Database = {
       qr_codes: {
         Row: {
           bg_color: string
+          border_style: string
           created_at: string
+          design_preset: string | null
           fg_color: string
           folder_id: string | null
           id: string
@@ -31,7 +33,9 @@ export type Database = {
         }
         Insert: {
           bg_color?: string
+          border_style?: string
           created_at?: string
+          design_preset?: string | null
           fg_color?: string
           folder_id?: string | null
           id?: string
@@ -45,7 +49,9 @@ export type Database = {
         }
         Update: {
           bg_color?: string
+          border_style?: string
           created_at?: string
+          design_preset?: string | null
           fg_color?: string
           folder_id?: string | null
           id?: string
