@@ -319,17 +319,19 @@ const QRGenerator = () => {
           <Card className="shadow-lg border-border/50 backdrop-blur-sm bg-card/95">
             <CardContent className="pt-6 flex items-center justify-center min-h-[400px]">
               {qrValue ? (
-                <div className="p-8 bg-white rounded-xl shadow-md transition-all duration-300 hover:shadow-xl">
-                  <QRCodeSVG
-                    id="qr-code"
-                    value={qrValue}
-                    size={Math.min(size, 300)}
-                    level="H"
-                    fgColor={fgColor}
-                    bgColor={bgColor}
-                    className="transition-all duration-300"
-                    imageSettings={logoDataUrl ? { src: logoDataUrl, height: Math.min(size, 300) * 0.2, width: Math.min(size, 300) * 0.2, excavate: true } : undefined}
-                  />
+                <div className="transition-all duration-300">
+                  <QRFrame borderStyle={borderStyle} fgColor={fgColor} bgColor={bgColor}>
+                    <QRCodeSVG
+                      id="qr-code"
+                      value={qrValue}
+                      size={Math.min(size, 280)}
+                      level="H"
+                      fgColor={fgColor}
+                      bgColor={bgColor}
+                      className="transition-all duration-300"
+                      imageSettings={logoDataUrl ? { src: logoDataUrl, height: Math.min(size, 280) * 0.2, width: Math.min(size, 280) * 0.2, excavate: true } : undefined}
+                    />
+                  </QRFrame>
                 </div>
               ) : (
                 <div className="text-center space-y-4 px-8">
