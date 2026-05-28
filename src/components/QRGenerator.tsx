@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, Sparkles, Wifi, User, Mail, Phone, MessageSquare, Link2, Type, Save, LogOut } from "lucide-react";
+import { Download, Sparkles, Wifi, User, Mail, Phone, MessageSquare, Link2, Type, Save, LogOut, ImagePlus, X } from "lucide-react";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +30,9 @@ const QRGenerator = () => {
   const [size, setSize] = useState(256);
   const [fgColor, setFgColor] = useState("#000000");
   const [bgColor, setBgColor] = useState("#FFFFFF");
+  const [label, setLabel] = useState("");
+  const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [textData, setTextData] = useState({ text: "" });
   const [urlData, setUrlData] = useState({ url: "" });
@@ -39,6 +43,18 @@ const QRGenerator = () => {
   const [emailData, setEmailData] = useState({ email: "", subject: "", body: "" });
   const [phoneData, setPhoneData] = useState({ phone: "" });
   const [smsData, setSmsData] = useState({ phone: "", message: "" });
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 500_000) {
+      toast.error("Logo must be under 500KB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setLogoDataUrl(reader.result as string);
+    reader.readAsDataURL(file);
+  };
 
   const getTemplateData = () => {
     switch (activeTemplate) {
@@ -78,6 +94,8 @@ const QRGenerator = () => {
         fg_color: fgColor,
         bg_color: bgColor,
         size,
+        label: label || null,
+        logo_data_url: logoDataUrl,
       }]);
       if (error) throw error;
     },
@@ -94,12 +112,16 @@ const QRGenerator = () => {
     fg_color: string;
     bg_color: string;
     size: number;
+    label?: string | null;
+    logo_data_url?: string | null;
   }) => {
     const type = item.template_type as TemplateType;
     setActiveTemplate(type);
     setFgColor(item.fg_color);
     setBgColor(item.bg_color);
     setSize(item.size);
+    setLabel(item.label || "");
+    setLogoDataUrl(item.logo_data_url || null);
     const d = item.template_data;
     switch (type) {
       case "text": setTextData(d as typeof textData); break;
@@ -229,6 +251,34 @@ const QRGenerator = () => {
                     <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-full h-10 rounded-md border border-input cursor-pointer" />
                   </div>
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="label-input" className="text-sm font-semibold">Label (optional)</Label>
+                  <Input id="label-input" placeholder="My QR code" value={label} onChange={(e) => setLabel(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold">Center Logo</Label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                    <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="flex-1">
+                      <ImagePlus className="w-4 h-4 mr-2" />
+                      {logoDataUrl ? "Change Logo" : "Upload Logo"}
+                    </Button>
+                    {logoDataUrl && (
+                      <>
+                        <img src={logoDataUrl} alt="Logo preview" className="w-9 h-9 rounded border border-border object-contain bg-white" />
+                        <Button type="button" variant="ghost" size="icon" onClick={() => { setLogoDataUrl(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}>
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="flex gap-2">
@@ -250,7 +300,16 @@ const QRGenerator = () => {
             <CardContent className="pt-6 flex items-center justify-center min-h-[400px]">
               {qrValue ? (
                 <div className="p-8 bg-white rounded-xl shadow-md transition-all duration-300 hover:shadow-xl">
-                  <QRCodeSVG id="qr-code" value={qrValue} size={Math.min(size, 300)} level="H" fgColor={fgColor} bgColor={bgColor} className="transition-all duration-300" />
+                  <QRCodeSVG
+                    id="qr-code"
+                    value={qrValue}
+                    size={Math.min(size, 300)}
+                    level="H"
+                    fgColor={fgColor}
+                    bgColor={bgColor}
+                    className="transition-all duration-300"
+                    imageSettings={logoDataUrl ? { src: logoDataUrl, height: Math.min(size, 300) * 0.2, width: Math.min(size, 300) * 0.2, excavate: true } : undefined}
+                  />
                 </div>
               ) : (
                 <div className="text-center space-y-4 px-8">
