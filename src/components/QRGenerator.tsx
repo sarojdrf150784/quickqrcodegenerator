@@ -115,12 +115,6 @@ const QRGenerator = () => {
     label?: string | null;
     logo_data_url?: string | null;
   }) => {
-    template_type: string;
-    template_data: Record<string, unknown>;
-    fg_color: string;
-    bg_color: string;
-    size: number;
-  }) => {
     const type = item.template_type as TemplateType;
     setActiveTemplate(type);
     setFgColor(item.fg_color);
