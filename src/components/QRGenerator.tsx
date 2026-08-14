@@ -189,7 +189,7 @@ const QRGenerator = () => {
           <div className="flex items-center gap-2">
             <Sparkles className="w-8 h-8 text-primary" />
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              QR Code Generator
+              HNS QuickCode Creator
             </h1>
           </div>
           <div className="flex items-center gap-2">
